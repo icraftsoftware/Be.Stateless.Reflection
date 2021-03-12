@@ -55,11 +55,7 @@ namespace Be.Stateless.Dummies.Reflection
 		}
 
 		public static readonly ReflectedDummy Instance = new();
-
-		[SuppressMessage("Style", "IDE0044:Add readonly modifier")]
 		private static string _staticField = nameof(_staticField);
-
-		[SuppressMessage("Style", "IDE0044:Add readonly modifier")]
 		private string _field = nameof(_field);
 	}
 }
