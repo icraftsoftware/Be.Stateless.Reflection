@@ -1,6 +1,6 @@
-﻿#region Copyright & License
+#region Copyright & License
 
-// Copyright © 2012 - 2021 François Chabot
+// Copyright © 2012 - 2025 François Chabot
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Be.Stateless.Dummies.Reflection
+namespace Be.Stateless.Dummies.Reflection;
+
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+internal class ReflectedGenericDummy<T>
+	where T : new()
 {
-	[SuppressMessage("ReSharper", "UnusedMember.Global")]
-	internal class ReflectedGenericDummy<T> where T : new()
-	{
-		public static T Instance => new();
-	}
+	public static T Instance => new();
 }

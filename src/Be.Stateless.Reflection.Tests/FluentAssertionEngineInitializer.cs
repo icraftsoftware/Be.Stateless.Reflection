@@ -1,13 +1,13 @@
 #region Copyright & License
 
 // Copyright © 2012 - 2025 François Chabot
-//
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
+// 
 // http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,21 +16,19 @@
 
 #endregion
 
-using System.Reflection;
-using Be.Stateless.Extensions;
+using Be.Stateless;
+using FluentAssertions;
+using FluentAssertions.Extensibility;
 
-namespace Be.Stateless.Reflection.Extensions;
+[assembly: AssertionEngineInitializer(typeof(FluentAssertionEngineInitializer), nameof(FluentAssertionEngineInitializer.AcknowledgeSoftWarning))]
 
-public static class AssemblyNameExtensions
+namespace Be.Stateless;
+
+// see https://fluentassertions.com/introduction#licensing
+file static class FluentAssertionEngineInitializer
 {
-	public static string GetCultureName(this AssemblyName name)
+	public static void AcknowledgeSoftWarning()
 	{
-		return name.CultureName.IfNotNullOrEmpty(c => c) ?? "neutral";
-	}
-
-	public static string GetPublicKeyTokenString(this AssemblyName name)
-	{
-		// @formatter:wrap_chained_method_calls chop_if_long
-		return name.GetPublicKeyToken().ToHex();
+		License.Accepted = true;
 	}
 }

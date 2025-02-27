@@ -1,6 +1,6 @@
-﻿#region Copyright & License
+#region Copyright & License
 
-// Copyright © 2012 - 2021 François Chabot
+// Copyright © 2012 - 2025 François Chabot
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 #endregion
 
-namespace Be.Stateless.Dummies.Reflection
-{
-	internal class ReflectedDerivedGenericDummy : ReflectedGenericDummy<ReflectedDerivedGenericDummy> { }
-}
+namespace Be.Stateless.Dummies.Reflection;
+
+internal class ReflectedDerivedGenericDummy : ReflectedGenericDummy<ReflectedDerivedGenericDummy> { }

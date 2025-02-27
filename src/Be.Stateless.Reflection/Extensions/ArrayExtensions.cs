@@ -1,6 +1,6 @@
-﻿#region Copyright & License
+#region Copyright & License
 
-// Copyright © 2012 - 2022 François Chabot
+// Copyright © 2012 - 2025 François Chabot
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,15 +19,14 @@
 using System.Globalization;
 using System.Linq;
 
-namespace Be.Stateless.Extensions
+namespace Be.Stateless.Extensions;
+
+public static class ArrayExtensions
 {
-	public static class ArrayExtensions
+	public static string ToHex(this byte[] bytes)
 	{
-		public static string ToHex(this byte[] bytes)
-		{
-			return bytes == null || bytes.Length == 0
-				? null
-				: bytes.Aggregate(string.Empty, (k, b) => k + b.ToString("x2", CultureInfo.InvariantCulture));
-		}
+		return bytes == null || bytes.Length == 0
+			? null
+			: bytes.Aggregate(string.Empty, (k, b) => k + b.ToString("x2", CultureInfo.InvariantCulture));
 	}
 }

@@ -1,4 +1,4 @@
-﻿# Be.Stateless.Reflection
+# Be.Stateless.Reflection
 
 ##### Build Pipelines
 

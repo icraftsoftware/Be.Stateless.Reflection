@@ -1,13 +1,13 @@
 #region Copyright & License
 
 // Copyright © 2012 - 2025 François Chabot
-//
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
+// 
 // http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,21 +16,9 @@
 
 #endregion
 
-using System.Reflection;
-using Be.Stateless.Extensions;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Be.Stateless.Reflection.Extensions;
-
-public static class AssemblyNameExtensions
-{
-	public static string GetCultureName(this AssemblyName name)
-	{
-		return name.CultureName.IfNotNullOrEmpty(c => c) ?? "neutral";
-	}
-
-	public static string GetPublicKeyTokenString(this AssemblyName name)
-	{
-		// @formatter:wrap_chained_method_calls chop_if_long
-		return name.GetPublicKeyToken().ToHex();
-	}
-}
+[assembly: SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
+[assembly: SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Using nested classes is a common organizational approach in xUnit tests.")]
+[assembly: SuppressMessage("Globalization", "CA1305:Specify IFormatProvider")]
+[assembly: SuppressMessage("Maintainability", "CA1515:Consider making public types internal", Justification = "Unit requires test classes to be public")]

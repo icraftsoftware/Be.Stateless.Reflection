@@ -1,6 +1,6 @@
-﻿#region Copyright & License
+#region Copyright & License
 
-// Copyright © 2012 - 2021 François Chabot
+// Copyright © 2012 - 2025 François Chabot
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,44 +18,43 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Be.Stateless.Dummies.Reflection
+namespace Be.Stateless.Dummies.Reflection;
+
+[SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
+internal class ReflectedDummy
 {
-	[SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
-	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
-	[SuppressMessage("ReSharper", "UnusedMember.Local")]
-	internal class ReflectedDummy
+	public static string StaticFieldSpy => _staticField;
+
+	private static string StaticProperty { get; set; }
+
+	public static string StaticPropertySpy => StaticProperty;
+
+	private static void StaticMethod(string value)
 	{
-		public static string StaticFieldSpy => _staticField;
-
-		private static string StaticProperty { get; set; }
-
-		public static string StaticPropertySpy => StaticProperty;
-
-		private static void StaticMethod(string value)
-		{
-			_staticField = value;
-		}
-
-		private ReflectedDummy() { }
-
-		public string FieldSpy => _field;
-
-		public string PropertySpy => Property;
-
-		private string Property { get; set; }
-
-		private void Method(string value)
-		{
-			_field = value;
-		}
-
-		private void Method(int value)
-		{
-			_field = value.ToString();
-		}
-
-		public static readonly ReflectedDummy Instance = new();
-		private static string _staticField = nameof(_staticField);
-		private string _field = nameof(_field);
+		_staticField = value;
 	}
+
+	private ReflectedDummy() { }
+
+	public string FieldSpy => _field;
+
+	public string PropertySpy => Property;
+
+	private string Property { get; set; }
+
+	private void Method(string value)
+	{
+		_field = value;
+	}
+
+	private void Method(int value)
+	{
+		_field = value.ToString();
+	}
+
+	public static readonly ReflectedDummy Instance = new();
+	private static string _staticField = nameof(_staticField);
+	private string _field = nameof(_field);
 }

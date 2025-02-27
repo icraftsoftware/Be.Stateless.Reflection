@@ -1,6 +1,6 @@
-﻿#region Copyright & License
+#region Copyright & License
 
-// Copyright © 2012 - 2021 François Chabot
+// Copyright © 2012 - 2025 François Chabot
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,177 +22,299 @@ using FluentAssertions;
 using Xunit;
 using static FluentAssertions.FluentActions;
 
-namespace Be.Stateless.Reflection
+namespace Be.Stateless.Reflection;
+
+public static class ReflectorFixture
 {
-	public static class ReflectorFixture
+	#region Nested Type: FieldReflectionFixture
+
+	[Collection("Sequential")]
+	public class FieldReflectionFixture
 	{
-		#region Nested Type: FieldReflectionFixture
-
-		[Collection("Sequential")]
-		public class FieldReflectionFixture
+		[Fact]
+		public void GetInstanceField()
 		{
-			[Fact]
-			public void GetInstanceField()
-			{
-				Reflector.TryGetField(ReflectedDummy.Instance, "_field", out _).Should().BeTrue();
-				Reflector.GetField(ReflectedDummy.Instance, "_field").Should().Be(ReflectedDummy.Instance.FieldSpy);
+			Reflector.TryGetField(ReflectedDummy.Instance, "_field", out _)
+				.Should()
+				.BeTrue();
+			Reflector.GetField(ReflectedDummy.Instance, "_field")
+				.Should()
+				.Be(ReflectedDummy.Instance.FieldSpy);
 
-				Reflector.TryGetField(ReflectedDummy.Instance, "_missingField", out _).Should().BeFalse();
-				Invoking(() => Reflector.GetField(ReflectedDummy.Instance, "_missingField")).Should().Throw<ArgumentException>();
-			}
-
-			[Fact]
-			public void GetStaticFieldThroughGeneric()
-			{
-				Reflector.TryGetField<ReflectedDummy>("_staticField", out _).Should().BeTrue();
-				Reflector.GetField<ReflectedDummy>("_staticField").Should().Be(ReflectedDummy.StaticFieldSpy);
-
-				Reflector.TryGetField<ReflectedDummy>("_missingStaticField", out _).Should().BeFalse();
-				Invoking(() => Reflector.GetField<ReflectedDummy>("_missingStaticField")).Should().Throw<ArgumentException>();
-			}
-
-			[Fact]
-			public void GetStaticFieldThroughType()
-			{
-				Reflector.TryGetField(typeof(ReflectedDummy), "_staticField", out _).Should().BeTrue();
-				Reflector.GetField(typeof(ReflectedDummy), "_staticField").Should().Be(ReflectedDummy.StaticFieldSpy);
-
-				Reflector.TryGetField(typeof(ReflectedDummy), "_missingStaticField", out _).Should().BeFalse();
-				Invoking(() => Reflector.GetField(typeof(ReflectedDummy), "_missingStaticField")).Should().Throw<ArgumentException>();
-			}
-
-			[Fact]
-			public void SetInstanceField()
-			{
-				Reflector.SetField(ReflectedDummy.Instance, "_field", nameof(SetInstanceField));
-				ReflectedDummy.Instance.FieldSpy.Should().Be(nameof(SetInstanceField));
-			}
-
-			[Fact]
-			public void SetStaticFieldThroughGeneric()
-			{
-				Reflector.SetField<ReflectedDummy>("_staticField", nameof(SetStaticFieldThroughGeneric));
-				ReflectedDummy.StaticFieldSpy.Should().Be(nameof(SetStaticFieldThroughGeneric));
-			}
-
-			[Fact]
-			public void SetStaticFieldThroughType()
-			{
-				Reflector.SetField(typeof(ReflectedDummy), "_staticField", nameof(SetStaticFieldThroughType));
-				ReflectedDummy.StaticFieldSpy.Should().Be(nameof(SetStaticFieldThroughType));
-			}
+			Reflector.TryGetField(ReflectedDummy.Instance, "_missingField", out _)
+				.Should()
+				.BeFalse();
+			Invoking(() => Reflector.GetField(ReflectedDummy.Instance, "_missingField"))
+				.Should()
+				.Throw<ArgumentException>();
 		}
 
-		#endregion
-
-		#region Nested Type: MethodReflectionFixture
-
-		[Collection("Sequential")]
-		public class MethodReflectionFixture
+		[Fact]
+		public void GetStaticFieldThroughGeneric()
 		{
-			[Fact]
-			public void InvokeInstanceMethod()
-			{
-				Reflector.TryInvokeMethod(ReflectedDummy.Instance, "Method", new object[] { nameof(InvokeInstanceMethod) }, out _).Should().BeTrue();
-				Reflector.InvokeMethod(ReflectedDummy.Instance, "Method", nameof(InvokeInstanceMethod)).Should().BeNull();
-				ReflectedDummy.Instance.FieldSpy.Should().Be(nameof(InvokeInstanceMethod));
+			Reflector.TryGetField<ReflectedDummy>("_staticField", out _)
+				.Should()
+				.BeTrue();
+			Reflector.GetField<ReflectedDummy>("_staticField")
+				.Should()
+				.Be(ReflectedDummy.StaticFieldSpy);
 
-				Reflector.TryInvokeMethod(ReflectedDummy.Instance, "MissingMethod", new object[] { nameof(InvokeInstanceMethod) }, out _).Should().BeFalse();
-				Invoking(() => Reflector.InvokeMethod(ReflectedDummy.Instance, "MissingMethod", nameof(InvokeInstanceMethod))).Should().Throw<ArgumentException>();
-			}
-
-			[Fact]
-			public void InvokeStaticMethodThroughGeneric()
-			{
-				Reflector.TryInvokeMethod<ReflectedDummy>("StaticMethod", new object[] { nameof(InvokeStaticMethodThroughGeneric) }, out _).Should().BeTrue();
-				Reflector.InvokeMethod<ReflectedDummy>("StaticMethod", nameof(InvokeStaticMethodThroughGeneric)).Should().BeNull();
-				ReflectedDummy.StaticFieldSpy.Should().Be(nameof(InvokeStaticMethodThroughGeneric));
-
-				Reflector.TryInvokeMethod<ReflectedDummy>("MissingStaticMethod", new object[] { nameof(InvokeStaticMethodThroughGeneric) }, out _).Should().BeFalse();
-				Invoking(() => Reflector.InvokeMethod<ReflectedDummy>("MissingStaticMethod", nameof(InvokeStaticMethodThroughGeneric))).Should().Throw<ArgumentException>();
-			}
-
-			[Fact]
-			public void InvokeStaticMethodThroughType()
-			{
-				Reflector.TryInvokeMethod(typeof(ReflectedDummy), "StaticMethod", new object[] { nameof(InvokeStaticMethodThroughType) }, out _).Should().BeTrue();
-				Reflector.InvokeMethod(typeof(ReflectedDummy), "StaticMethod", nameof(InvokeStaticMethodThroughType)).Should().BeNull();
-				ReflectedDummy.StaticFieldSpy.Should().Be(nameof(InvokeStaticMethodThroughType));
-
-				Reflector.TryInvokeMethod(typeof(ReflectedDummy), "MissingStaticMethod", new object[] { nameof(InvokeStaticMethodThroughType) }, out _).Should().BeFalse();
-				Invoking(() => Reflector.InvokeMethod(typeof(ReflectedDummy), "MissingStaticMethod", nameof(InvokeStaticMethodThroughType))).Should().Throw<ArgumentException>();
-			}
+			Reflector.TryGetField<ReflectedDummy>("_missingStaticField", out _)
+				.Should()
+				.BeFalse();
+			Invoking(() => Reflector.GetField<ReflectedDummy>("_missingStaticField"))
+				.Should()
+				.Throw<ArgumentException>();
 		}
 
-		#endregion
-
-		#region Nested Type: PropertyReflectionFixture
-
-		[Collection("Sequential")]
-		public class PropertyReflectionFixture
+		[Fact]
+		public void GetStaticFieldThroughType()
 		{
-			[Fact]
-			public void GetGenericStaticPropertyThruDerivedType()
-			{
-				Reflector.TryGetProperty(typeof(ReflectedDerivedGenericDummy), "Instance", out _).Should().BeTrue();
-				Reflector.GetProperty(typeof(ReflectedDerivedGenericDummy), "Instance").Should().NotBeNull();
+			Reflector.TryGetField(typeof(ReflectedDummy), "_staticField", out _)
+				.Should()
+				.BeTrue();
+			Reflector.GetField(typeof(ReflectedDummy), "_staticField")
+				.Should()
+				.Be(ReflectedDummy.StaticFieldSpy);
 
-				Reflector.TryGetProperty(typeof(ReflectedDerivedGenericDummy), "Missing", out _).Should().BeFalse();
-				Invoking(() => Reflector.GetProperty(typeof(ReflectedDerivedGenericDummy), "Missing")).Should().Throw<ArgumentException>();
-			}
-
-			[Fact]
-			public void GetInstanceProperty()
-			{
-				Reflector.TryGetProperty(ReflectedDummy.Instance, "Property", out _).Should().BeTrue();
-				Reflector.GetProperty(ReflectedDummy.Instance, "Property").Should().Be(ReflectedDummy.Instance.PropertySpy);
-
-				Reflector.TryGetProperty(ReflectedDummy.Instance, "Missing", out _).Should().BeFalse();
-				Invoking(() => Reflector.GetProperty(ReflectedDummy.Instance, "Missing")).Should().Throw<ArgumentException>();
-			}
-
-			[Fact]
-			public void GetStaticPropertyThroughGeneric()
-			{
-				Reflector.TryGetProperty<ReflectedDummy>("StaticProperty", out _).Should().BeTrue();
-				Reflector.GetProperty<ReflectedDummy>("StaticProperty").Should().Be(ReflectedDummy.StaticPropertySpy);
-
-				Reflector.TryGetProperty<ReflectedDummy>("MissingStaticProperty", out _).Should().BeFalse();
-				Invoking(() => Reflector.GetProperty<ReflectedDummy>("MissingStaticProperty")).Should().Throw<ArgumentException>();
-			}
-
-			[Fact]
-			public void GetStaticPropertyThroughType()
-			{
-				Reflector.TryGetProperty(typeof(ReflectedDummy), "StaticProperty", out _).Should().BeTrue();
-				Reflector.GetProperty(typeof(ReflectedDummy), "StaticProperty").Should().Be(ReflectedDummy.StaticPropertySpy);
-
-				Reflector.TryGetProperty(typeof(ReflectedDummy), "MissingStaticProperty", out _).Should().BeFalse();
-				Invoking(() => Reflector.GetProperty(typeof(ReflectedDummy), "MissingStaticProperty")).Should().Throw<ArgumentException>();
-			}
-
-			[Fact]
-			public void SetInstanceProperty()
-			{
-				Reflector.SetProperty(ReflectedDummy.Instance, "Property", nameof(SetInstanceProperty));
-				ReflectedDummy.Instance.PropertySpy.Should().Be(nameof(SetInstanceProperty));
-			}
-
-			[Fact]
-			public void SetStaticPropertyThroughGeneric()
-			{
-				Reflector.SetProperty<ReflectedDummy>("StaticProperty", nameof(SetStaticPropertyThroughGeneric));
-				ReflectedDummy.StaticPropertySpy.Should().Be(nameof(SetStaticPropertyThroughGeneric));
-			}
-
-			[Fact]
-			public void SetStaticPropertyThroughType()
-			{
-				Reflector.SetProperty(typeof(ReflectedDummy), "StaticProperty", nameof(SetStaticPropertyThroughType));
-				ReflectedDummy.StaticPropertySpy.Should().Be(nameof(SetStaticPropertyThroughType));
-			}
+			Reflector.TryGetField(typeof(ReflectedDummy), "_missingStaticField", out _)
+				.Should()
+				.BeFalse();
+			Invoking(() => Reflector.GetField(typeof(ReflectedDummy), "_missingStaticField"))
+				.Should()
+				.Throw<ArgumentException>();
 		}
 
-		#endregion
+		[Fact]
+		public void SetInstanceField()
+		{
+			Reflector.SetField(ReflectedDummy.Instance, "_field", nameof(SetInstanceField));
+			ReflectedDummy.Instance.FieldSpy.Should()
+				.Be(nameof(SetInstanceField));
+		}
+
+		[Fact]
+		public void SetStaticFieldThroughGeneric()
+		{
+			Reflector.SetField<ReflectedDummy>("_staticField", nameof(SetStaticFieldThroughGeneric));
+			ReflectedDummy.StaticFieldSpy.Should()
+				.Be(nameof(SetStaticFieldThroughGeneric));
+		}
+
+		[Fact]
+		public void SetStaticFieldThroughType()
+		{
+			Reflector.SetField(typeof(ReflectedDummy), "_staticField", nameof(SetStaticFieldThroughType));
+			ReflectedDummy.StaticFieldSpy.Should()
+				.Be(nameof(SetStaticFieldThroughType));
+		}
 	}
+
+	#endregion
+
+	#region Nested Type: MethodReflectionFixture
+
+	[Collection("Sequential")]
+	public class MethodReflectionFixture
+	{
+		[Fact]
+		public void InvokeInstanceMethod()
+		{
+			Reflector.TryInvokeMethod(
+					ReflectedDummy.Instance,
+					"Method",
+					new object[] {
+						nameof(InvokeInstanceMethod)
+					},
+					out _)
+				.Should()
+				.BeTrue();
+			Reflector.InvokeMethod(ReflectedDummy.Instance, "Method", nameof(InvokeInstanceMethod))
+				.Should()
+				.BeNull();
+			ReflectedDummy.Instance.FieldSpy.Should()
+				.Be(nameof(InvokeInstanceMethod));
+
+			Reflector.TryInvokeMethod(
+					ReflectedDummy.Instance,
+					"MissingMethod",
+					new object[] {
+						nameof(InvokeInstanceMethod)
+					},
+					out _)
+				.Should()
+				.BeFalse();
+			Invoking(() => Reflector.InvokeMethod(ReflectedDummy.Instance, "MissingMethod", nameof(InvokeInstanceMethod)))
+				.Should()
+				.Throw<ArgumentException>();
+		}
+
+		[Fact]
+		public void InvokeStaticMethodThroughGeneric()
+		{
+			Reflector.TryInvokeMethod<ReflectedDummy>(
+					"StaticMethod",
+					new object[] {
+						nameof(InvokeStaticMethodThroughGeneric)
+					},
+					out _)
+				.Should()
+				.BeTrue();
+			Reflector.InvokeMethod<ReflectedDummy>("StaticMethod", nameof(InvokeStaticMethodThroughGeneric))
+				.Should()
+				.BeNull();
+			ReflectedDummy.StaticFieldSpy.Should()
+				.Be(nameof(InvokeStaticMethodThroughGeneric));
+
+			Reflector.TryInvokeMethod<ReflectedDummy>(
+					"MissingStaticMethod",
+					new object[] {
+						nameof(InvokeStaticMethodThroughGeneric)
+					},
+					out _)
+				.Should()
+				.BeFalse();
+			Invoking(() => Reflector.InvokeMethod<ReflectedDummy>("MissingStaticMethod", nameof(InvokeStaticMethodThroughGeneric)))
+				.Should()
+				.Throw<ArgumentException>();
+		}
+
+		[Fact]
+		public void InvokeStaticMethodThroughType()
+		{
+			Reflector.TryInvokeMethod(
+					typeof(ReflectedDummy),
+					"StaticMethod",
+					new object[] {
+						nameof(InvokeStaticMethodThroughType)
+					},
+					out _)
+				.Should()
+				.BeTrue();
+			Reflector.InvokeMethod(typeof(ReflectedDummy), "StaticMethod", nameof(InvokeStaticMethodThroughType))
+				.Should()
+				.BeNull();
+			ReflectedDummy.StaticFieldSpy.Should()
+				.Be(nameof(InvokeStaticMethodThroughType));
+
+			Reflector.TryInvokeMethod(
+					typeof(ReflectedDummy),
+					"MissingStaticMethod",
+					new object[] {
+						nameof(InvokeStaticMethodThroughType)
+					},
+					out _)
+				.Should()
+				.BeFalse();
+			Invoking(() => Reflector.InvokeMethod(typeof(ReflectedDummy), "MissingStaticMethod", nameof(InvokeStaticMethodThroughType)))
+				.Should()
+				.Throw<ArgumentException>();
+		}
+	}
+
+	#endregion
+
+	#region Nested Type: PropertyReflectionFixture
+
+	[Collection("Sequential")]
+	public class PropertyReflectionFixture
+	{
+		[Fact]
+		public void GetGenericStaticPropertyThruDerivedType()
+		{
+			Reflector.TryGetProperty(typeof(ReflectedDerivedGenericDummy), "Instance", out _)
+				.Should()
+				.BeTrue();
+			Reflector.GetProperty(typeof(ReflectedDerivedGenericDummy), "Instance")
+				.Should()
+				.NotBeNull();
+
+			Reflector.TryGetProperty(typeof(ReflectedDerivedGenericDummy), "Missing", out _)
+				.Should()
+				.BeFalse();
+			Invoking(() => Reflector.GetProperty(typeof(ReflectedDerivedGenericDummy), "Missing"))
+				.Should()
+				.Throw<ArgumentException>();
+		}
+
+		[Fact]
+		public void GetInstanceProperty()
+		{
+			Reflector.TryGetProperty(ReflectedDummy.Instance, "Property", out _)
+				.Should()
+				.BeTrue();
+			Reflector.GetProperty(ReflectedDummy.Instance, "Property")
+				.Should()
+				.Be(ReflectedDummy.Instance.PropertySpy);
+
+			Reflector.TryGetProperty(ReflectedDummy.Instance, "Missing", out _)
+				.Should()
+				.BeFalse();
+			Invoking(() => Reflector.GetProperty(ReflectedDummy.Instance, "Missing"))
+				.Should()
+				.Throw<ArgumentException>();
+		}
+
+		[Fact]
+		public void GetStaticPropertyThroughGeneric()
+		{
+			Reflector.TryGetProperty<ReflectedDummy>("StaticProperty", out _)
+				.Should()
+				.BeTrue();
+			Reflector.GetProperty<ReflectedDummy>("StaticProperty")
+				.Should()
+				.Be(ReflectedDummy.StaticPropertySpy);
+
+			Reflector.TryGetProperty<ReflectedDummy>("MissingStaticProperty", out _)
+				.Should()
+				.BeFalse();
+			Invoking(() => Reflector.GetProperty<ReflectedDummy>("MissingStaticProperty"))
+				.Should()
+				.Throw<ArgumentException>();
+		}
+
+		[Fact]
+		public void GetStaticPropertyThroughType()
+		{
+			Reflector.TryGetProperty(typeof(ReflectedDummy), "StaticProperty", out _)
+				.Should()
+				.BeTrue();
+			Reflector.GetProperty(typeof(ReflectedDummy), "StaticProperty")
+				.Should()
+				.Be(ReflectedDummy.StaticPropertySpy);
+
+			Reflector.TryGetProperty(typeof(ReflectedDummy), "MissingStaticProperty", out _)
+				.Should()
+				.BeFalse();
+			Invoking(() => Reflector.GetProperty(typeof(ReflectedDummy), "MissingStaticProperty"))
+				.Should()
+				.Throw<ArgumentException>();
+		}
+
+		[Fact]
+		public void SetInstanceProperty()
+		{
+			Reflector.SetProperty(ReflectedDummy.Instance, "Property", nameof(SetInstanceProperty));
+			ReflectedDummy.Instance.PropertySpy.Should()
+				.Be(nameof(SetInstanceProperty));
+		}
+
+		[Fact]
+		public void SetStaticPropertyThroughGeneric()
+		{
+			Reflector.SetProperty<ReflectedDummy>("StaticProperty", nameof(SetStaticPropertyThroughGeneric));
+			ReflectedDummy.StaticPropertySpy.Should()
+				.Be(nameof(SetStaticPropertyThroughGeneric));
+		}
+
+		[Fact]
+		public void SetStaticPropertyThroughType()
+		{
+			Reflector.SetProperty(typeof(ReflectedDummy), "StaticProperty", nameof(SetStaticPropertyThroughType));
+			ReflectedDummy.StaticPropertySpy.Should()
+				.Be(nameof(SetStaticPropertyThroughType));
+		}
+	}
+
+	#endregion
 }
