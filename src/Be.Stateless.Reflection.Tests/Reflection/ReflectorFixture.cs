@@ -1,13 +1,13 @@
 #region Copyright & License
 
 // Copyright © 2012 - 2025 François Chabot
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Be.Stateless.Dummies.Reflection;
 using FluentAssertions;
 using Xunit;
@@ -44,9 +45,9 @@ public static class ReflectorFixture
 			Reflector.TryGetField(ReflectedDummy.Instance, "_missingField", out _)
 				.Should()
 				.BeFalse();
-			Invoking(() => Reflector.GetField(ReflectedDummy.Instance, "_missingField"))
+			Invoking(static () => Reflector.GetField(ReflectedDummy.Instance, "_missingField"))
 				.Should()
-				.Throw<ArgumentException>();
+				.Throw<InvalidOperationException>();
 		}
 
 		[Fact]
@@ -62,12 +63,13 @@ public static class ReflectorFixture
 			Reflector.TryGetField<ReflectedDummy>("_missingStaticField", out _)
 				.Should()
 				.BeFalse();
-			Invoking(() => Reflector.GetField<ReflectedDummy>("_missingStaticField"))
+			Invoking(static () => Reflector.GetField<ReflectedDummy>("_missingStaticField"))
 				.Should()
-				.Throw<ArgumentException>();
+				.Throw<InvalidOperationException>();
 		}
 
 		[Fact]
+		[SuppressMessage("Usage", "CA2263:Prefer generic overload when type is known")]
 		public void GetStaticFieldThroughType()
 		{
 			Reflector.TryGetField(typeof(ReflectedDummy), "_staticField", out _)
@@ -80,9 +82,9 @@ public static class ReflectorFixture
 			Reflector.TryGetField(typeof(ReflectedDummy), "_missingStaticField", out _)
 				.Should()
 				.BeFalse();
-			Invoking(() => Reflector.GetField(typeof(ReflectedDummy), "_missingStaticField"))
+			Invoking(static () => Reflector.GetField(typeof(ReflectedDummy), "_missingStaticField"))
 				.Should()
-				.Throw<ArgumentException>();
+				.Throw<InvalidOperationException>();
 		}
 
 		[Fact]
@@ -102,6 +104,7 @@ public static class ReflectorFixture
 		}
 
 		[Fact]
+		[SuppressMessage("Usage", "CA2263:Prefer generic overload when type is known")]
 		public void SetStaticFieldThroughType()
 		{
 			Reflector.SetField(typeof(ReflectedDummy), "_staticField", nameof(SetStaticFieldThroughType));
@@ -120,13 +123,7 @@ public static class ReflectorFixture
 		[Fact]
 		public void InvokeInstanceMethod()
 		{
-			Reflector.TryInvokeMethod(
-					ReflectedDummy.Instance,
-					"Method",
-					new object[] {
-						nameof(InvokeInstanceMethod)
-					},
-					out _)
+			Reflector.TryInvokeMethod(ReflectedDummy.Instance, "Method", [nameof(InvokeInstanceMethod)], out _)
 				.Should()
 				.BeTrue();
 			Reflector.InvokeMethod(ReflectedDummy.Instance, "Method", nameof(InvokeInstanceMethod))
@@ -135,29 +132,18 @@ public static class ReflectorFixture
 			ReflectedDummy.Instance.FieldSpy.Should()
 				.Be(nameof(InvokeInstanceMethod));
 
-			Reflector.TryInvokeMethod(
-					ReflectedDummy.Instance,
-					"MissingMethod",
-					new object[] {
-						nameof(InvokeInstanceMethod)
-					},
-					out _)
+			Reflector.TryInvokeMethod(ReflectedDummy.Instance, "MissingMethod", [nameof(InvokeInstanceMethod)], out _)
 				.Should()
 				.BeFalse();
-			Invoking(() => Reflector.InvokeMethod(ReflectedDummy.Instance, "MissingMethod", nameof(InvokeInstanceMethod)))
+			Invoking(static () => Reflector.InvokeMethod(ReflectedDummy.Instance, "MissingMethod", nameof(InvokeInstanceMethod)))
 				.Should()
-				.Throw<ArgumentException>();
+				.Throw<InvalidOperationException>();
 		}
 
 		[Fact]
 		public void InvokeStaticMethodThroughGeneric()
 		{
-			Reflector.TryInvokeMethod<ReflectedDummy>(
-					"StaticMethod",
-					new object[] {
-						nameof(InvokeStaticMethodThroughGeneric)
-					},
-					out _)
+			Reflector.TryInvokeMethod<ReflectedDummy>("StaticMethod", [nameof(InvokeStaticMethodThroughGeneric)], out _)
 				.Should()
 				.BeTrue();
 			Reflector.InvokeMethod<ReflectedDummy>("StaticMethod", nameof(InvokeStaticMethodThroughGeneric))
@@ -166,29 +152,19 @@ public static class ReflectorFixture
 			ReflectedDummy.StaticFieldSpy.Should()
 				.Be(nameof(InvokeStaticMethodThroughGeneric));
 
-			Reflector.TryInvokeMethod<ReflectedDummy>(
-					"MissingStaticMethod",
-					new object[] {
-						nameof(InvokeStaticMethodThroughGeneric)
-					},
-					out _)
+			Reflector.TryInvokeMethod<ReflectedDummy>("MissingStaticMethod", [nameof(InvokeStaticMethodThroughGeneric)], out _)
 				.Should()
 				.BeFalse();
-			Invoking(() => Reflector.InvokeMethod<ReflectedDummy>("MissingStaticMethod", nameof(InvokeStaticMethodThroughGeneric)))
+			Invoking(static () => Reflector.InvokeMethod<ReflectedDummy>("MissingStaticMethod", nameof(InvokeStaticMethodThroughGeneric)))
 				.Should()
-				.Throw<ArgumentException>();
+				.Throw<InvalidOperationException>();
 		}
 
 		[Fact]
+		[SuppressMessage("Usage", "CA2263:Prefer generic overload when type is known")]
 		public void InvokeStaticMethodThroughType()
 		{
-			Reflector.TryInvokeMethod(
-					typeof(ReflectedDummy),
-					"StaticMethod",
-					new object[] {
-						nameof(InvokeStaticMethodThroughType)
-					},
-					out _)
+			Reflector.TryInvokeMethod(typeof(ReflectedDummy), "StaticMethod", [nameof(InvokeStaticMethodThroughType)], out _)
 				.Should()
 				.BeTrue();
 			Reflector.InvokeMethod(typeof(ReflectedDummy), "StaticMethod", nameof(InvokeStaticMethodThroughType))
@@ -197,18 +173,12 @@ public static class ReflectorFixture
 			ReflectedDummy.StaticFieldSpy.Should()
 				.Be(nameof(InvokeStaticMethodThroughType));
 
-			Reflector.TryInvokeMethod(
-					typeof(ReflectedDummy),
-					"MissingStaticMethod",
-					new object[] {
-						nameof(InvokeStaticMethodThroughType)
-					},
-					out _)
+			Reflector.TryInvokeMethod(typeof(ReflectedDummy), "MissingStaticMethod", [nameof(InvokeStaticMethodThroughType)], out _)
 				.Should()
 				.BeFalse();
-			Invoking(() => Reflector.InvokeMethod(typeof(ReflectedDummy), "MissingStaticMethod", nameof(InvokeStaticMethodThroughType)))
+			Invoking(static () => Reflector.InvokeMethod(typeof(ReflectedDummy), "MissingStaticMethod", nameof(InvokeStaticMethodThroughType)))
 				.Should()
-				.Throw<ArgumentException>();
+				.Throw<InvalidOperationException>();
 		}
 	}
 
@@ -220,6 +190,7 @@ public static class ReflectorFixture
 	public class PropertyReflectionFixture
 	{
 		[Fact]
+		[SuppressMessage("Usage", "CA2263:Prefer generic overload when type is known")]
 		public void GetGenericStaticPropertyThruDerivedType()
 		{
 			Reflector.TryGetProperty(typeof(ReflectedDerivedGenericDummy), "Instance", out _)
@@ -232,9 +203,9 @@ public static class ReflectorFixture
 			Reflector.TryGetProperty(typeof(ReflectedDerivedGenericDummy), "Missing", out _)
 				.Should()
 				.BeFalse();
-			Invoking(() => Reflector.GetProperty(typeof(ReflectedDerivedGenericDummy), "Missing"))
+			Invoking(static () => Reflector.GetProperty(typeof(ReflectedDerivedGenericDummy), "Missing"))
 				.Should()
-				.Throw<ArgumentException>();
+				.Throw<InvalidOperationException>();
 		}
 
 		[Fact]
@@ -250,9 +221,9 @@ public static class ReflectorFixture
 			Reflector.TryGetProperty(ReflectedDummy.Instance, "Missing", out _)
 				.Should()
 				.BeFalse();
-			Invoking(() => Reflector.GetProperty(ReflectedDummy.Instance, "Missing"))
+			Invoking(static () => Reflector.GetProperty(ReflectedDummy.Instance, "Missing"))
 				.Should()
-				.Throw<ArgumentException>();
+				.Throw<InvalidOperationException>();
 		}
 
 		[Fact]
@@ -268,12 +239,13 @@ public static class ReflectorFixture
 			Reflector.TryGetProperty<ReflectedDummy>("MissingStaticProperty", out _)
 				.Should()
 				.BeFalse();
-			Invoking(() => Reflector.GetProperty<ReflectedDummy>("MissingStaticProperty"))
+			Invoking(static () => Reflector.GetProperty<ReflectedDummy>("MissingStaticProperty"))
 				.Should()
-				.Throw<ArgumentException>();
+				.Throw<InvalidOperationException>();
 		}
 
 		[Fact]
+		[SuppressMessage("Usage", "CA2263:Prefer generic overload when type is known")]
 		public void GetStaticPropertyThroughType()
 		{
 			Reflector.TryGetProperty(typeof(ReflectedDummy), "StaticProperty", out _)
@@ -286,9 +258,9 @@ public static class ReflectorFixture
 			Reflector.TryGetProperty(typeof(ReflectedDummy), "MissingStaticProperty", out _)
 				.Should()
 				.BeFalse();
-			Invoking(() => Reflector.GetProperty(typeof(ReflectedDummy), "MissingStaticProperty"))
+			Invoking(static () => Reflector.GetProperty(typeof(ReflectedDummy), "MissingStaticProperty"))
 				.Should()
-				.Throw<ArgumentException>();
+				.Throw<InvalidOperationException>();
 		}
 
 		[Fact]
@@ -308,6 +280,7 @@ public static class ReflectorFixture
 		}
 
 		[Fact]
+		[SuppressMessage("Usage", "CA2263:Prefer generic overload when type is known")]
 		public void SetStaticPropertyThroughType()
 		{
 			Reflector.SetProperty(typeof(ReflectedDummy), "StaticProperty", nameof(SetStaticPropertyThroughType));

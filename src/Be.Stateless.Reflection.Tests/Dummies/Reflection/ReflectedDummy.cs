@@ -1,13 +1,13 @@
 #region Copyright & License
 
 // Copyright © 2012 - 2025 François Chabot
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,25 +23,29 @@ namespace Be.Stateless.Dummies.Reflection;
 [SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
 [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local")]
 [SuppressMessage("ReSharper", "UnusedMember.Local")]
-internal class ReflectedDummy
+internal sealed class ReflectedDummy
 {
 	public static string StaticFieldSpy => _staticField;
 
-	private static string StaticProperty { get; set; }
+	private static string? StaticProperty { get; set; }
 
-	public static string StaticPropertySpy => StaticProperty;
+	public static string? StaticPropertySpy => StaticProperty;
 
 	private static void StaticMethod(string value)
 	{
 		_staticField = value;
 	}
 
-	private ReflectedDummy() { }
+	private ReflectedDummy()
+	{
+		Property = nameof(ReflectedDummy);
+	}
 
 	public string FieldSpy => _field;
 
 	public string PropertySpy => Property;
 
+	[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Local")]
 	private string Property { get; set; }
 
 	private void Method(string value)

@@ -16,6 +16,7 @@
 
 #endregion
 
+using System;
 using System.Reflection;
 using Be.Stateless.Extensions;
 
@@ -25,11 +26,13 @@ public static class AssemblyNameExtensions
 {
 	public static string GetCultureName(this AssemblyName name)
 	{
-		return name.CultureName.IfNotNullOrEmpty(c => c) ?? "neutral";
+		ArgumentNullException.ThrowIfNull(name);
+		return name.CultureName.IfNotNullOrEmpty(static c => c) ?? "neutral";
 	}
 
-	public static string GetPublicKeyTokenString(this AssemblyName name)
+	public static string? GetPublicKeyTokenString(this AssemblyName name)
 	{
+		ArgumentNullException.ThrowIfNull(name);
 		// @formatter:wrap_chained_method_calls chop_if_long
 		return name.GetPublicKeyToken().ToHex();
 	}

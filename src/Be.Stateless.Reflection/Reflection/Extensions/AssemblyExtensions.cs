@@ -16,6 +16,7 @@
 
 #endregion
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -28,11 +29,13 @@ public static class AssemblyExtensions
 {
 	public static string GetCultureName(this Assembly assembly)
 	{
+		ArgumentNullException.ThrowIfNull(assembly);
 		return assembly.GetName().GetCultureName();
 	}
 
-	public static string GetPublicKeyTokenString(this Assembly assembly)
+	public static string? GetPublicKeyTokenString(this Assembly assembly)
 	{
+		ArgumentNullException.ThrowIfNull(assembly);
 		return assembly.GetName().GetPublicKeyTokenString();
 	}
 }

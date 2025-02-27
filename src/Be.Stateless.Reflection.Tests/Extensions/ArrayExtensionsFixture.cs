@@ -28,7 +28,7 @@ public class ArrayExtensionsFixture
 	[InlineData(null, null)]
 	[InlineData(new byte[] { }, null)]
 	[InlineData(new byte[] { 20, 1, 5, 6, 72, 23 }, "140105064817")]
-	public void ToHex(byte[] actual, string expected)
+	public void ToHex(byte[]? actual, string? expected)
 	{
 		actual.ToHex()
 			.Should()
